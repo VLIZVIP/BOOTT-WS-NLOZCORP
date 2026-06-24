@@ -1,4 +1,4 @@
-//Base 100% Editable creditos a Naufrabot 
+﻿//Base 100% Editable creditos a Naufrabot 
 
 //Página oficial naufrabot.com
 
@@ -27,7 +27,7 @@ const util = require("util")
 const speed = require("performance-now");
 const mimetype = require('mime-types')
 const { exec, spawn, execSync } = require("child_process")
-let phoneNumber = "5199999999"; // cambiar número
+let phoneNumber = process.env.PHONE_NUMBER || ""; // numero con codigo de pais, sin +
 const axios = require("axios")
  const ffmpeg = require('fluent-ffmpeg')
  
@@ -147,13 +147,16 @@ async function startProo() {
 
   // 🟢 Si no hay sesión registrada, generar el código de vinculación de 8 dígitos
   if (!sock.authState.creds.registered) {
-    let number = await question(
-      chalk.cyan("📱 Escribe tu número de WhatsApp con código de país (solo números): ")
-    );
+    let number = phoneNumber;
+    if (!number && process.stdin.isTTY) {
+      number = await question(
+        chalk.cyan("📱 Escribe tu número de WhatsApp con código de país (solo números): ")
+      );
+    }
     number = number.replace(/[^0-9]/g, "");
 
     if (!number) {
-      console.log(chalk.red("❌ Número inválido."));
+      console.log(chalk.red("❌ Número inválido. En Railway agrega la variable PHONE_NUMBER, ejemplo: 51999999999"));
       process.exit(1);
     }
 
