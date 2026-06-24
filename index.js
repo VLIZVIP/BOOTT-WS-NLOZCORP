@@ -100,8 +100,15 @@ const APINAUFRA = 'https://api.naufrabot.com'
 const pairingCode = true;
 
 const useMobile = process.argv.includes("--mobile")
-const rl = readline.createInterface({ input: process.stdin, output: process.stdout })
-const question = (text) => new Promise((resolve) => rl.question(text, resolve))
+const question = (text) => {
+  const rl = readline.createInterface({ input: process.stdin, output: process.stdout })
+  return new Promise((resolve) => {
+    rl.question(text, (answer) => {
+      rl.close()
+      resolve(answer)
+    })
+  })
+}
 
 function getGroupAdmins(participants) {
 admins = []
@@ -143,7 +150,6 @@ async function startProo() {
     let number = await question(
       chalk.cyan("📱 Escribe tu número de WhatsApp con código de país (solo números): ")
     );
-    rl.close();
     number = number.replace(/[^0-9]/g, "");
 
     if (!number) {
@@ -2725,4 +2731,3 @@ console.log(color('  [❗] El archivo Index fue modificada',"blue"));
 process.exit()
 }
 })
-
