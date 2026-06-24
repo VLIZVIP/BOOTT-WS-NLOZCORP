@@ -160,14 +160,26 @@ async function startProo() {
       process.exit(1);
     }
 
-    console.log(chalk.yellow("⌛ Solicitando código de vinculación..."));
-    try {
-      const code = await sock.requestPairingCode(number);
-      console.log(chalk.bgGreen.black("✅ CÓDIGO DE VINCULACIÓN:"), chalk.white(code));
-    } catch (err) {
-      console.error(chalk.red("❌ Error al generar código de vinculación:"), err.message);
-      process.exit(1);
+    console.log(chalk.yellow("⌛ Conectando con WhatsApp antes de pedir el código..."));
+    await delay(5000);
+
+    let code;
+    for (let intento = 1; intento <= 3; intento++) {
+      try {
+        console.log(chalk.yellow(`⌛ Solicitando código de vinculación... intento ${intento}/3`));
+        code = await sock.requestPairingCode(number);
+        break;
+      } catch (err) {
+        if (intento === 3) {
+          console.error(chalk.red("❌ Error al generar código de vinculación:"), err.message);
+          process.exit(1);
+        }
+        console.log(chalk.yellow(`⚠️ WhatsApp cerró la conexión, reintentando en 5 segundos... (${err.message})`));
+        await delay(5000);
+      }
     }
+
+    console.log(chalk.bgGreen.black("✅ CÓDIGO DE VINCULACIÓN:"), chalk.white(code));
   }
 
   // 🔄 Monitorear el estado de conexión
